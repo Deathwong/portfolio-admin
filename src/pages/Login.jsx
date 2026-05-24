@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MdLock, MdEmail } from 'react-icons/md'
-import { login } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
@@ -9,16 +8,15 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
-  const { saveToken }           = useAuth()
-  const navigate                = useNavigate()
+  const { login }  = useAuth()
+  const navigate   = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const token = await login(email, password)
-      saveToken(token)
+      await login(email, password)
       navigate('/', { replace: true })
     } catch {
       setError('Email ou mot de passe incorrect.')

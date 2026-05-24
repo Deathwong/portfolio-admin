@@ -1,22 +1,32 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { login as apiLogin, logout as apiLogout, me } from '../api/auth'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('admin_token'))
+  const [isAuthenticated, setAuthenticated] = useState(false)
+  const [checking, setChecking]             = useState(true)
 
-  const saveToken = (t) => {
-    localStorage.setItem('admin_token', t)
-    setToken(t)
+  // Au démarrage, on vérifie si le cookie JWT est encore valide
+  useEffect(() => {
+    me()
+      .then(() => setAuthenticated(true))
+      .catch(() => setAuthenticated(false))
+      .finally(() => setChecking(false))
+  }, [])
+
+  const login = async (email, password) => {
+    await apiLogin(email, password)
+    setAuthenticated(true)
   }
 
-  const logout = () => {
-    localStorage.removeItem('admin_token')
-    setToken(null)
+  const logout = async () => {
+    await apiLogout()
+    setAuthenticated(false)
   }
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated: !!token, saveToken, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, checking, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
