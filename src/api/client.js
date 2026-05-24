@@ -7,7 +7,7 @@ const client = axios.create({
 // Injecte le token sur chaque requête
 client.interceptors.request.use(config => {
   const token = localStorage.getItem('admin_token')
-  if (token) config.headers['X-API-Key'] = token
+  if (token) config.headers['Authorization'] = `Bearer ${token}`
   return config
 })
 
